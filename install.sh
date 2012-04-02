@@ -17,11 +17,16 @@ dep=(
 	["bash"]="$(which bash 2> /dev/null)"
 	["curl"]="$(which curl 2> /dev/null)")
 install_home="/usr/local"
+DFN_RC="$install_home/src/defollownotify/defollownotify.rc"
 
 #End Init Variables
 
 echo -e "\n* Installation Defollow Notify -"
 
+if [ -d $install_home/src/defollownotify ]; then
+	echo -e "\n* You have already installed Defollow Notify!"
+	exit 0
+fi
 
 echo -e "\n* Checking user's privileges..."
 
@@ -73,18 +78,39 @@ if [ ! -d $install_home/src/defollownotify ]; then
 	echo -e "\n	- Create directory [ defollownotify ] inside $install_home/src"
 	cp conf/defollownotify.rc $install_home/src/defollownotify
 	echo -e "\n	- Copy file [ defollownotify.rc ] inside $install_home/src/defollownotify"
-	cp -fr lib $install_home/src/defollownotify
-	echo -e "\n	- Copy directory [ lib ] inside $install_home/src/defollownotify"
+	cp -fr lib/*.sh $install_home/bin
+	chmod +x $install_home/bin/TwitterOAuth.sh
+	chmod +x $install_home/bin/OAuth.sh
+	echo -e "\n	- Copy files [ OAuth.sh TwitterOAuth.sh ] inside $install_home/bin"
 	cp bin/defollownotify.sh $install_home/bin/defollownotify
 	echo -e "\n	- Copy file execute [ defollownotify.sh ] inside /usr/local/bin"
 	chmod +x $install_home/bin/defollownotify
 	echo -e "\n	- Change permissions at the file [ defollownotify.sh ] inside /usr/local/bin"
 	echo "USERNAME=$username" >> $install_home/src/defollownotify/defollownotify.rc
 	echo "HOMEDIR=$install_home/src/defollownotify" >> $install_home/src/defollownotify/defollownotify.rc
-
-	echo -e "\n* Installation complete!"
-	exit 0
-else
-	echo -e "\n* You have already installed Defollow Notify!"
-	exit 0
 fi
+
+source $DFN_RC
+OAuth_sh=$(which TwitterOAuth.sh)
+(( $? != 0 )) && echo 'Unable to locate TwitterOAuth.sh! Make sure it is in searching PATH.' && exit 1
+source "$OAuth_sh"
+
+echo -e "\n* Configuaration account Twitter.."
+TO_init
+
+if [[ "$oauth_token" == "" ]] || [[ "$oauth_token_secret" == "" ]]; then
+	TO_access_token_helper
+	if (( $? == 0 )); then
+		oauth_token=${TO_ret[0]}
+		oauth_token_secret=${TO_ret[1]}
+		echo "oauth_token='${TO_ret[0]}'" >> "$DFN_RC"
+		echo "oauth_token_secret='${TO_ret[1]}'" >> "$DFN_RC"
+		echo "Token saved."
+	else
+		echo 'Unable to get access token'
+		exit 1
+	fi
+fi
+
+echo -e "\n* Installation Complete!"
+exit 0
