@@ -33,18 +33,6 @@ echo -e "\n* Checking user's privileges..."
 if [ $(id -u) -ne 0 ]; then
 	echo -e "\n* ERROR: User $(whoami) is not root, and does not have sudo privileges"
 	exit 1
-#else
-#	while [ -z $check_user ]; do
-#		echo "	Write your exact username: "
-#		read username
-#		id -u -r $username &> /dev/null
-#		
-#		if [ $? -eq 0 ]; then
-#			check_user=1
-#		else
-#			echo "	Username don't exists! Please insert a valid username."
-#		fi
-#	done
 fi
 
 echo -e "\n* Write your username Twitter: "
@@ -70,8 +58,6 @@ fi
 
 
 echo -e "\n* Installing in progress.."
-
-#install_home="$(awk -F: -v v="$username" '{ if ( $1 == v ) print $6 }' /etc/passwd)"
 
 if [ ! -d $install_home/src/defollownotify ]; then
 	mkdir $install_home/src/defollownotify
