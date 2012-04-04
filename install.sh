@@ -86,7 +86,7 @@ if [ ! -d $install_home/src/defollownotify ]; then
 	echo -e "\n	- Copy file execute [ defollownotify.sh ] inside /usr/local/bin"
 	chmod +x $install_home/bin/defollownotify
 	echo -e "\n	- Change permissions at the file [ defollownotify.sh ] inside /usr/local/bin"
-	echo "USERNAME=$username" >> $install_home/src/defollownotify/defollownotify.rc
+	echo "USER_NAME=$username" >> $install_home/src/defollownotify/defollownotify.rc
 	echo "HOMEDIR=$install_home/src/defollownotify" >> $install_home/src/defollownotify/defollownotify.rc
 fi
 
@@ -95,7 +95,7 @@ OAuth_sh=$(which TwitterOAuth.sh)
 (( $? != 0 )) && echo 'Unable to locate TwitterOAuth.sh! Make sure it is in searching PATH.' && exit 1
 source "$OAuth_sh"
 
-echo -e "\n* Configuaration account Twitter.."
+echo -e "\n* Configuration account Twitter.."
 TO_init
 
 if [[ "$oauth_token" == "" ]] || [[ "$oauth_token_secret" == "" ]]; then

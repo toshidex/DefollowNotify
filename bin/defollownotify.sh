@@ -10,6 +10,8 @@
 
 DFN_RC="/usr/local/src/defollownotify/defollownotify.rc"
 OAuth_sh=$(which TwitterOAuth.sh)
+HOME_IDS="$HOME/.defollownotify"
+
 
 (( $? != 0 )) && echo 'Unable to locate TwitterOAuth.sh! Make sure it is in searching PATH.' && exit 1
 source "$OAuth_sh"
@@ -22,7 +24,7 @@ load_config() {
 	
 	[[ "$oauth_consumer_key" == "" ]] && echo -e "\n The variable [ oauth_consumer_key ] not found!\n $(exit)"
         [[ "$oauth_consumer_secret" == "" ]] && echo -e "\n The variable [ oauth_consumer_secret ] not found!\n $(exit)"
-	[[ "$USERNAME" == "" ]] && echo -e "\n You have not insert an account Twitter"
+	[[ "$USER_NAME" == "" ]] && echo -e "\n You have not insert an account Twitter"
 
 	TO_init
 
@@ -43,26 +45,35 @@ load_config() {
 
 create_ids() {
 
-	filename="/$HOME/.defollownotify/$1"
+	filename="$1"
 	
 	#delete the first three rows
 	sed -i '1,3d' $filename
 
 	#delete tags <id> and </id>
-	sed -i 's/<id>//g' -e 's/<\/id>//g' $filename
+	sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
 
+	#inversion file and delete the first three rows
+	tac $filename > /tmp/ids_firstxx.xml
+	sed -i '1,3d' /tmp/ids_firstxx.xml
 	
+	#move temporany file into original directory
+	mv /tmp/ids_firstxx.xml $HOME_IDS/ids_first.xml
+	rm $filename
 }
 
 download_ids_list() {
 
-	if [ -f $HOME/.defollownotify/ids_first.json ]; then
- 		curl -o $HOME/.defollownotify/ids_second.json "https://api.twitter.com/1/followers/ids.json?cursor=-1&screen_name=$USER"
-		create_ids "ids_second.json"
+	if [ -f $HOME/.defollownotify/ids_first.xml ]; then
+ 		curl -o $ids_second "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		create_ids "ids_second.xml"
         else
-                curl -o $HOME/.defollownotify/ids_first.json "https://api.twitter.com/1/followers/ids.json?cursor=-1&screen_name=$USER"
-		create_ids "ids_first.json"
-        fi
+                curl -o /tmp/ids_first.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		local next_cursor=$(grep "<next_cursor>" /tmp/ids_first.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
+		if [ $next_cursor -eq 0 ]; then
+			create_ids "/tmp/ids_first.xml"
+        	fi
+	fi
 }
 
 
