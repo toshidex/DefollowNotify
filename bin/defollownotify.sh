@@ -43,35 +43,87 @@ load_config() {
 	fi
 }
 
+convert_ids() {
+
+	screen_name=$(curl "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g') 
+
+}
+
+
+
+compare_ids() {
+
+	list_diff="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
+	
+	if [[ $list_diff == "" ]]; then
+		echo "The list IDS has not changed!"
+		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+		exit 0
+	else
+		for ids_index in $list_diff; do
+			convert_ids "$ids_index"
+			echo "News per @$USER_NAME: L'utente [ $screen_name ] non ti segue più."
+			
+		done
+		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+		exit 0
+	fi
+
+}
+
 create_ids() {
 
 	filename="$1"
-	
-	#delete the first three rows
-	sed -i '1,3d' $filename
 
-	#delete tags <id> and </id>
-	sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+	if [[ $filename == "/tmp/ids.xml" ]]; then
+			
+		#delete the first three rows
+		sed -i '1,3d' $filename
 
-	#inversion file and delete the first three rows
-	tac $filename > /tmp/ids_firstxx.xml
-	sed -i '1,3d' /tmp/ids_firstxx.xml
+		#delete tags <id> and </id>
+		sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+
+		#inversion file and delete the first three rows
+		tac $filename > /tmp/idsxx.xml
+		sed -i '1,2d' /tmp/idsxx.xml
+		tac /tmp/idsxx.xml > $filename	
 	
-	#move temporany file into original directory
-	mv /tmp/ids_firstxx.xml $HOME_IDS/ids_first.xml
-	rm $filename
+		#move temporany file into original directory
+		mv $filename $HOME_IDS
+		rm /tmp/idsxx.xml
+	else	
+		#CREATE SECOND FILE IDS
+		#delete the first three rows
+                sed -i '1,3d' $filename
+
+                #delete tags <id> and </id>
+                sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+
+                #inversion file and delete the first three rows
+                tac $filename > /tmp/ids_newxx.xml
+                sed -i '1,2d' /tmp/ids_newxx.xml
+         	tac /tmp/ids_newxx.xml > $filename
+
+                #move temporany file into original directory
+                mv $filename $HOME_IDS
+                rm /tmp/ids_newxx.xml
+	fi
 }
 
 download_ids_list() {
 
-	if [ -f $HOME/.defollownotify/ids_first.xml ]; then
- 		curl -o $ids_second "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
-		create_ids "ids_second.xml"
-        else
-                curl -o /tmp/ids_first.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
-		local next_cursor=$(grep "<next_cursor>" /tmp/ids_first.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
+	if [ -f $HOME/.defollownotify/ids.xml ]; then
+ 		curl -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
-			create_ids "/tmp/ids_first.xml"
+			create_ids "/tmp/ids_new.xml"
+			compare_ids
+		fi
+        else
+                curl -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
+		if [ $next_cursor -eq 0 ]; then
+			create_ids "/tmp/ids.xml"
         	fi
 	fi
 }
