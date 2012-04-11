@@ -3,7 +3,7 @@
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
 # @Name : Defollow Notify
-# @Version : 0.0.1
+# @Version : 0.0.2
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
@@ -47,10 +47,11 @@ load_config() {
 convert_ids() {
 
 	name=$(curl "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
-	if [[ $name == "" ]]; then
+	if [[ "$name" == "" ]]; then
 		return
 	fi
-	screen_name=( $screen_name $name )
+	screen_name=( ${screen_name[@]} $name )
+	
 }
 
 compare_ids() {
@@ -140,13 +141,20 @@ download_ids_list() {
 notify_me() {
 
 	lenght=${#screen_name[@]}
+	echo ""
 	for index in $(seq 0 $lenght); do
-		TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more." ""
+		if [ -z ${screen_name[$index]} ]; then exit 0; fi
+
+		#TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more." ""
+		echo "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more."
 	done
 
 }
 
 
 load_config
-download_ids_list
+compare_ids
+#download_ids_list
 notify_me
+
+exit 0
