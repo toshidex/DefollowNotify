@@ -153,8 +153,7 @@ notify_me() {
 
 
 load_config
-compare_ids
-#download_ids_list
+download_ids_list
 notify_me
 
 exit 0
