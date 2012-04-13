@@ -46,7 +46,7 @@ load_config() {
 
 convert_ids() {
 
-	name=$(curl "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
+	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
 	if [[ "$name" == "" ]]; then
 		return
 	fi
@@ -63,10 +63,10 @@ compare_ids() {
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
 	else
+		i=0
 		for ids_index in $list_diff; do
 			convert_ids "$ids_index"
-			#echo "News per @$USER_NAME: L'utente [ $screen_name ] non ti segue più."
-			
+			echo -n "$((++i)).."	
 		done
 		#echo "News per @$USER_NAME: L'utente [ ${screen_name[@]} ] non ti segue più."
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
@@ -116,7 +116,7 @@ create_ids() {
 download_ids_list() {
 
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
- 		curl -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+ 		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
@@ -126,7 +126,7 @@ download_ids_list() {
 			exit 1
 		fi
         else
-                curl -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+                curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids.xml"
@@ -146,14 +146,15 @@ notify_me() {
 		if [ -z ${screen_name[$index]} ]; then exit 0; fi
 
 		#TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more." ""
-		echo "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more."
+		echo "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU"
 	done
 
 }
 
 
 load_config
-download_ids_list
+compare_ids
+#download_ids_list
 notify_me
 
 exit 0
