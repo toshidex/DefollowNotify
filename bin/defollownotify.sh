@@ -145,8 +145,7 @@ notify_me() {
 	for index in $(seq 0 $lenght); do
 		if [ -z ${screen_name[$index]} ]; then exit 0; fi
 
-		#TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more." ""
-		echo "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU"
+		TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
 	done
 
 }
