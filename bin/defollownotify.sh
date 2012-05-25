@@ -3,7 +3,7 @@
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
 # @Name : Defollow Notify
-# @Version : 0.0.2
+# @Version : 0.0.3
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
@@ -16,6 +16,20 @@ screen_name=()
 
 (( $? != 0 )) && echo 'Unable to locate TwitterOAuth.sh! Make sure it is in searching PATH.' && exit 1
 source "$OAuth_sh"
+
+
+usage(){
+
+	cat << "USAGE"
+        
+Use: defollownotify [OPTION]
+        
+   -B      Enable Bastard Mode - Notification via Twitter
+
+USAGE
+
+}
+
 
 load_config() {
 	
@@ -48,6 +62,7 @@ convert_ids() {
 
 	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
 	if [[ "$name" == "" ]]; then
+		echo "User [ $1 ] not found." 
 		return
 	fi
 	screen_name=( ${screen_name[@]} $name )
@@ -70,6 +85,7 @@ compare_ids() {
 		done
 		#echo "News per @$USER_NAME: L'utente [ ${screen_name[@]} ] non ti segue più."
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+		echo -n "Scanning complete!"
 	fi
 
 }
@@ -145,11 +161,31 @@ notify_me() {
 	for index in $(seq 0 $lenght); do
 		if [ -z ${screen_name[$index]} ]; then exit 0; fi
 
-		TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
+		if [[ $BASTARD_MODE == "TRUE" ]]; then
+			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
+			echo -e "\n $index. [ @${screen_name[$index]} ] not following you more. Notification sent!"
+		else
+			echo -e "\n $index. [ @${screen_name[$index]} ] not following you more!"
+		fi
 	done
-
 }
 
+
+while getopts ":Bh" opt; do
+	case $opt in
+		"B")
+			BASTARD_MODE="TRUE"
+		;;
+		"h")
+			usage
+			exit 0
+		;;
+		\?)
+			usage
+			exit 0
+		;;
+	esac
+done
 
 load_config
 download_ids_list
