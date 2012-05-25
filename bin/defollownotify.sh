@@ -37,9 +37,10 @@ load_config() {
 	
 	[[ -f "$DFN_RC" ]] && . "$DFN_RC" || echo -e "\n defollownotify.rc: File not found!\n $(exit)"
 	
-	[[ "$oauth_consumer_key" == "" ]] && echo -e "\n The variable [ oauth_consumer_key ] not found!\n $(exit)"
-        [[ "$oauth_consumer_secret" == "" ]] && echo -e "\n The variable [ oauth_consumer_secret ] not found!\n $(exit)"
-	[[ "$USER_NAME" == "" ]] && echo -e "\n You have not insert an account Twitter"
+	[[ "$oauth_consumer_key" == "" ]] && echo -e "\n The variable [ oauth_consumer_key ] not found!\n" && exit 1
+        [[ "$oauth_consumer_secret" == "" ]] && echo -e "\n The variable [ oauth_consumer_secret ] not found!\n" && exit 1
+	[[ "$USER_NAME" == "" ]] && echo -e "\n You have not insert an account Twitter!\n" && exit 1
+	[[ ! ("$BASTARD_MODE" == "TRUE" || "$BASTARD_MODE" == "FALSE") ]] && echo -e "\n You have not insert an value BOOLEAN (TRUE|FALSE)!\n" && exit 1
 
 	TO_init
 
@@ -171,6 +172,8 @@ notify_me() {
 }
 
 
+load_config
+
 while getopts ":Bh" opt; do
 	case $opt in
 		"B")
@@ -187,7 +190,6 @@ while getopts ":Bh" opt; do
 	esac
 done
 
-load_config
 download_ids_list
 notify_me
 
