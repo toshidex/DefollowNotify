@@ -63,7 +63,7 @@ convert_ids() {
 
 	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
 	if [[ "$name" == "" ]]; then
-		echo "User [ $1 ] not found." 
+		echo -e "User [ $1 ] not found.\n" 
 		return
 	fi
 	screen_name=( ${screen_name[@]} $name )
@@ -72,21 +72,30 @@ convert_ids() {
 
 compare_ids() {
 
-	list_diff="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
-	
-	if [[ $list_diff == "" ]]; then
-		echo "The list IDS has not changed!"
+	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
+	list_follower="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
+
+
+	if [[ $list_defollow == "" ]]; then
+		echo -e "\nInfo Diff:"
+		echo -e "        - New Follower: $(echo "$list_follower" | wc -w)"
+		echo -e "        - New Defollow: $(echo "$list_defollow" | wc -w) :("
+		echo "Finished!"
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
 	else
+		echo -e "\nInfo Diff:"
+		echo -e "        - New Follower: $(echo "$list_follower" | wc -w)"
+		echo -e "        - New Defollow: $(echo "$list_defollow" | wc -w) :)"
+		
+		echo -e "\nConversion ID to Nickname: \n"
 		i=0
-		for ids_index in $list_diff; do
+		for ids_index in $list_defollow; do
 			convert_ids "$ids_index"
 			echo -n "$((++i)).."	
 		done
-		#echo "News per @$USER_NAME: L'utente [ ${screen_name[@]} ] non ti segue più."
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
-		echo -n "Scanning complete!"
+		echo -n -e "Conversion completed!\n"
 	fi
 
 }
@@ -164,9 +173,9 @@ notify_me() {
 
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
 			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "\n $index. [ @${screen_name[$index]} ] not following you more. Notification sent!"
+			echo -e "$index. [ @${screen_name[$index]} ] not following you more. Notification sent!"
 		else
-			echo -e "\n $index. [ @${screen_name[$index]} ] not following you more!"
+			echo -e "$index. [ @${screen_name[$index]} ] not following you more!"
 		fi
 	done
 }
