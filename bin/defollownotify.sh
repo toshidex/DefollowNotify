@@ -3,7 +3,7 @@
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
 # @Name : Defollow Notify
-# @Version : 0.0.3
+# @Version : 0.0.4
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
@@ -63,7 +63,7 @@ convert_ids() {
 
 	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
 	if [[ "$name" == "" ]]; then
-		echo -e "User [ $1 ] not found.\n" 
+		echo -e "\e[0;1;34mUser [\e[m\e[0;1;31m $1 \e[m\e[0;1;34m] not found.\n\e[m" 
 		return
 	fi
 	screen_name=( ${screen_name[@]} $name )
@@ -77,18 +77,17 @@ compare_ids() {
 
 
 	if [[ $list_defollow == "" ]]; then
-		echo -e "\nInfo Diff:"
-		echo -e "        - New Follower: $(echo "$list_follower" | wc -w)"
-		echo -e "        - New Defollow: $(echo "$list_defollow" | wc -w) :("
-		echo "Finished!"
+		echo -e "\n* Info Diff:"
+		echo -e "       \e[0;1;34m - New Follower: $(echo "$list_follower" | wc -w) \e[m"
+		echo -e "       \e[0;1;31m - New Defollow: $(echo "$list_defollow" | wc -w) :( \e[m\n"
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
 	else
-		echo -e "\nInfo Diff:"
-		echo -e "        - New Follower: $(echo "$list_follower" | wc -w)"
-		echo -e "        - New Defollow: $(echo "$list_defollow" | wc -w) :)"
+		echo -e "\n* Info Diff:"
+		echo -e "       \e[0;1;34m - New Follower: $(echo "$list_follower" | wc -w) \e[m"
+		echo -e "       \e[0;1;32m - New Defollow: $(echo "$list_defollow" | wc -w) :) \e[m"
 		
-		echo -e "\nConversion ID to Nickname: \n"
+		echo -e "\n* Conversion ID to Nickname: \n"
 		i=0
 		for ids_index in $list_defollow; do
 			convert_ids "$ids_index"
@@ -142,6 +141,7 @@ create_ids() {
 download_ids_list() {
 
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
+		echo -e "\n* Download ids list.."
  		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
@@ -152,6 +152,7 @@ download_ids_list() {
 			exit 1
 		fi
         else
+		echo -e "\n* Download ids list.."
                 curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
@@ -168,14 +169,15 @@ notify_me() {
 
 	lenght=${#screen_name[@]}
 	echo ""
+	local i=0
 	for index in $(seq 0 $lenght); do
 		if [ -z ${screen_name[$index]} ]; then exit 0; fi
 
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
 			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "$index. [ @${screen_name[$index]} ] not following you more. Notification sent!"
+			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m @${screen_name[$index]}\e[m\e[0;1;34m ] not following you more. Notification sent!\e[m"
 		else
-			echo -e "$index. [ @${screen_name[$index]} ] not following you more!"
+			echo -e "\e[0;1;34m$((++i)). [\e[m \e[0;1;31m@${screen_name[$index]}\e[m \e[0;1;34m] not following you more!\e[m"
 		fi
 	done
 }
