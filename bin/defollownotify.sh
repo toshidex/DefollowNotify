@@ -59,6 +59,11 @@ load_config() {
 	fi
 }
 
+print_error() {
+
+	[[ ! -z $1 ]] && echo -e "\e[0;1;31m\n*ERROR:$error\e[m\n" && exit 1
+}
+
 convert_ids() {
 
 	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
@@ -143,6 +148,10 @@ download_ids_list() {
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
 		echo -e "\n* Download ids list.."
  		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		
+		local error=$(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
+		print_error $error
+		
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
@@ -154,6 +163,10 @@ download_ids_list() {
         else
 		echo -e "\n* Download ids list.."
                 curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+		
+		local error=$(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
+		print_error $error
+	
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids.xml"
