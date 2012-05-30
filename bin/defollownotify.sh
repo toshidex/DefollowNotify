@@ -3,7 +3,6 @@
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
 # @Name : Defollow Notify
-# @Version : 0.0.4
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
@@ -26,6 +25,7 @@ Use: defollownotify [OPTION]
         
    -B      Enable Bastard Mode - Notification via Twitter
 
+   -v	   Print Version
 USAGE
 
 }
@@ -199,10 +199,14 @@ notify_me() {
 
 load_config
 
-while getopts ":Bh" opt; do
+while getopts ":Bvh" opt; do
 	case $opt in
 		"B")
 			BASTARD_MODE="TRUE"
+		;;
+		"v")
+			echo -e "\nDefollowNotify - $(cat /usr/local/src/defollownotify/VERSION) \n";
+			exit 0
 		;;
 		"h")
 			usage

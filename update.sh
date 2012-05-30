@@ -3,7 +3,6 @@
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
 # @Name : Defollow Notify
-# @Version: 0.0.4
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
@@ -38,6 +37,8 @@ if [ -d $install_home/src/defollownotify ]; then
 	echo -e "\n	- Copy file execute [ defollownotify.sh ] inside /usr/local/bin"
 	chmod +x $install_home/bin/defollownotify
 	echo -e "\n	- Change permissions at the file [ defollownotify.sh ] inside /usr/local/bin"
+	cp VERSION $install_home/src/defollownotify/
+	echo -e "\n	- Copy file [ VERSION ] inside /usr/local/src/defollownotify"
 fi
 
 echo -e "\n* Update Complete!"
