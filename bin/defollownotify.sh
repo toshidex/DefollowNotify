@@ -61,6 +61,7 @@ load_config() {
 
 print_error() {
 
+
 	[[ ! -z $1 ]] && echo -e "\e[0;1;31m\n*ERROR:$error\e[m\n" && exit 1
 }
 
