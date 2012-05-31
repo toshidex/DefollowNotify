@@ -144,6 +144,17 @@ create_ids() {
 	fi
 }
 
+save_stat() {
+
+	if [[ ! -f $HOME/.defollownotify/stats.log ]]; then
+		touch $HOME/.defollownotify/stats.log
+	
+				
+	fi		
+
+
+}
+
 download_ids_list() {
 
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
@@ -157,6 +168,7 @@ download_ids_list() {
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
 			compare_ids
+			save_stat
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
