@@ -201,9 +201,9 @@ notify_me() {
 
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
 			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "http://twitter.com/\e[0;1;34m$((++i)). [\e[m\e[0;1;31m @${screen_name[$index]}\e[m\e[0;1;34m ] not following you more. Notification sent!\e[m"
+			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name[$index]}\e[m\e[0;1;34m ] not following you more. Notification sent!\e[m\nhttp://twitter.com/${screen_name[$index]}"
 		else
-			echo -e "http://twitter.com/\e[0;1;34m$((++i)). [\e[m \e[0;1;31m@${screen_name[$index]}\e[m \e[0;1;34m] not following you more!\e[m"
+			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name[$index]}\e[m \e[0;1;34m ] not following you more!\e[m\nhttp://twitter.com/${screen_name[$index]}"
 		fi
 	done
 }
