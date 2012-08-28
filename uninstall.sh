@@ -47,5 +47,5 @@ if [[ "$choose" == "y" || "$choose" == "Y" ]]; then
     done
 fi
 
-echo -e "\n* Uninstallation Complete!"
+echo -e "\n* Uninstall Complete!"
 exit 0
