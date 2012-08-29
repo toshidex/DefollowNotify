@@ -87,8 +87,8 @@ TO_access_token_helper () {
 
 	echo 'Please go to the following link to get the PIN:'
 	echo "  ${T_AUTHORIZE_TOKEN}?oauth_token=$_oauth_token"
-	
-	read -p 'PIN: ' PIN
+    
+    read -p 'PIN: ' PIN
 
 	# Access Token
 
