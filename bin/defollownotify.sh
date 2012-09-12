@@ -83,30 +83,35 @@ convert_ids() {
 compare_ids() {
 
 	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
-	list_follower="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
+	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
 
-	if [[ $list_defollow == "" && $list_follower == "" ]]; then
+	if [[ $list_defollow == "" && $list_follow == "" ]]; then
     	echo -n -e "Nothing has changed!\n"
         mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
-    fi
+    else
+        NUM_FOLLOW=$(echo "$_list_follow" | wc -w)
+        NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
 
-	if [[ ! $list_defollow == "" || ! $list_follower == "" ]]; then
-		echo -e "\n* Info Diff:"
-		echo -e "       \e[0;1;34m - New Follower: $(echo "$list_follower" | wc -w) \e[m"
-		echo -e "       \e[0;1;32m - New Defollow: $(echo "$list_defollow" | wc -w) \e[m"
+        echo -e "\n* Info Diff:"
+		echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
+		echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
 		
 		echo -e "\n* Conversion ID to Nickname: \n"
-		i=0
-        for ids_index in $list_follower; do
-            convert_ids "$ids_index" 1
-            echo -n "$((++i)).."
-        done
-        i=0
-		for ids_index in $list_defollow; do
-			convert_ids "$ids_index" 2
-			echo -n "$((++i)).."	
-		done
+		if [[ ! $NUM_FOLLOW == "0" ]]; then
+            i=0
+            for ids_index in $list_follow; do
+                convert_ids "$ids_index" 1
+                echo -n "$((++i)).."
+            done
+        fi
+        if [[ ! $NUM_DEFOLLOW == "0" ]]; then
+            i=0
+		    for ids_index in $list_defollow; do
+			    convert_ids "$ids_index" 2
+			    echo -n "$((++i)).."	
+		    done
+        fi
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		echo -n -e "Conversion completed!\n"
 	fi
