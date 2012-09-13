@@ -86,7 +86,7 @@ compare_ids() {
 	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
 
 	if [[ $list_defollow == "" && $list_follow == "" ]]; then
-    	echo -n -e "Nothing has changed!\n"
+    	echo -n -e "\nNothing has changed!\n"
         mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
     else
