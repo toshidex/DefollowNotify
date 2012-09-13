@@ -72,33 +72,46 @@ convert_ids() {
 		echo -e "\e[0;1;34mUser [\e[m\e[0;1;31m $1 \e[m\e[0;1;34m] not found.\n\e[m" 
 		return
 	fi
-	screen_name=( ${screen_name[@]} $name )
-	
+    
+    if [[ $2 == 1 ]]; then
+        screen_name_follow=(${screen_name_follow[@]} $name )
+    else
+        screen_name_defollow=( ${screen_name_defollow[@]} $name )	
+    fi
 }
 
 compare_ids() {
 
 	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
-	list_follower="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
+	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
 
-
-	if [[ $list_defollow == "" ]]; then
-		echo -e "\n* Info Diff:"
-		echo -e "       \e[0;1;34m - New Follower: $(echo "$list_follower" | wc -w) \e[m"
-		echo -e "       \e[0;1;31m - New Defollow: $(echo "$list_defollow" | wc -w) :( \e[m\n"
-		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+	if [[ $list_defollow == "" && $list_follow == "" ]]; then
+    	echo -n -e "\nNothing has changed!\n"
+        mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		exit 0
-	else
-		echo -e "\n* Info Diff:"
-		echo -e "       \e[0;1;34m - New Follower: $(echo "$list_follower" | wc -w) \e[m"
-		echo -e "       \e[0;1;32m - New Defollow: $(echo "$list_defollow" | wc -w) :) \e[m"
+    else
+        NUM_FOLLOW=$(echo "$_list_follow" | wc -w)
+        NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
+
+        echo -e "\n* Info Diff:"
+		echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
+		echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
 		
 		echo -e "\n* Conversion ID to Nickname: \n"
-		i=0
-		for ids_index in $list_defollow; do
-			convert_ids "$ids_index"
-			echo -n "$((++i)).."	
-		done
+		if [[ ! $NUM_FOLLOW == "0" ]]; then
+            i=0
+            for ids_index in $list_follow; do
+                convert_ids "$ids_index" 1
+                echo -n "$((++i)).."
+            done
+        fi
+        if [[ ! $NUM_DEFOLLOW == "0" ]]; then
+            i=0
+		    for ids_index in $list_defollow; do
+			    convert_ids "$ids_index" 2
+			    echo -n "$((++i)).."	
+		    done
+        fi
 		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 		echo -n -e "Conversion completed!\n"
 	fi
@@ -193,17 +206,20 @@ download_ids_list() {
 
 notify_me() {
 
-	lenght=${#screen_name[@]}
+    let "lenght_follow=${#screen_name_follow[@]}-1"
+    let "lenght_defollow=${#screen_name_defollow[@]}-1"
 	echo ""
 	local i=0
-	for index in $(seq 0 $lenght); do
-		if [ -z ${screen_name[$index]} ]; then exit 0; fi
-
+    for index in $(seq 0 $lenght_follow); do
+        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m"
+    done
+    local i=0
+    for index in $(seq 0 $lenght_defollow); do
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
-			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name[$index]}\e[m\e[0;1;34m ]\e[m"
+			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
+			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
 		else
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name[$index]}\e[m\e[0;1;34m ]\e[m"
+			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
 		fi
 	done
 }
