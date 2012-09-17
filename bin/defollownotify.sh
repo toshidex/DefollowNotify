@@ -28,6 +28,8 @@ Use: defollownotify [OPTION]
    -B      Enable Bastard Mode - Notification via Twitter
 
    -v	   Print Version
+
+* If you want uninstall defollownotify you have to run /usr/local/src/defollownotify/uninstall.sh
 USAGE
 
 }
@@ -58,11 +60,10 @@ load_config() {
 			echo 'Unable to get access token'
 			exit 1
 		fi
-	fi
+    fi
 }
 
 print_error() {
-
 
 	[[ ! -z $1 ]] && echo -e "\e[0;1;31m\n*ERROR:$error\e[m\n" && exit 1
 }
