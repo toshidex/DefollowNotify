@@ -4,7 +4,7 @@
 # @Author : Domenico Luciani aka DLion
 # @Name : Defollow Notify
 # @Copyright : 2012
-# @Site : http://coderwall.com/dlion
+# @Site : http://about.me/dlion
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
 ###################################################################
 
@@ -32,10 +32,10 @@ fi
 
 echo -e "\n* Uninstalling in progress...\n"
 
-rm -rv $install_home
 rm -v $root_d/bin/TwitterOAuth.sh
 rm -v $root_d/bin/OAuth.sh
 rm -v $root_d/bin/defollownotify
+rm -rv $install_home
 echo -e "\n* Do you want remove the follow list from the computer? (y/n)"
 read choose
 if [[ "$choose" == "y" || "$choose" == "Y" ]]; then
