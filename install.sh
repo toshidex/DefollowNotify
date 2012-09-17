@@ -2,9 +2,11 @@
 
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
+# @Implemented by : Domenico Luciani aka DLion
 # @Name : Defollow Notify
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
+# @Site : http://about.me/dlion
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
 ###############################################################################
 
@@ -71,6 +73,9 @@ if [ ! -d $install_home/src/defollownotify ]; then
 	echo -e "\n	- Copy file execute [ defollownotify.sh ] inside /usr/local/bin"
 	chmod +x $install_home/bin/defollownotify
 	echo -e "\n	- Change permissions at the file [ defollownotify.sh ] inside /usr/local/bin"
+    cp uninstall.sh $install_home/src/defollownotify
+    chmod +x $install_home/src/defollownotify/uninstall.sh
+    echo -e "\n - Copy uninstall inside $install_home/src/defollownotify"
 	echo "USER_NAME=$username" >> $install_home/src/defollownotify/defollownotify.rc
 	echo "HOMEDIR=$install_home/src/defollownotify" >> $install_home/src/defollownotify/defollownotify.rc
 fi
