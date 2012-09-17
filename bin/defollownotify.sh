@@ -2,9 +2,11 @@
 
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
+# @Implemented by : Domenico Luciani aka DLion
 # @Name : Defollow Notify
 # @Copyright : 2012
 # @Site : http://www.toshidex.org
+# @Site : http://about.me/dlion
 # @License : GNU AGPL v3 http://www.gnu.org/licenses/agpl.html
 ###############################################################################
 
@@ -84,19 +86,19 @@ compare_ids() {
 
 	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
 	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
+    NUM_FOLLOW=$(echo "$_list_follow" | wc -w)
+    NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
 
-	if [[ $list_defollow == "" && $list_follow == "" ]]; then
-    	echo -n -e "\nNothing has changed!\n"
-        mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+    echo -e "\n* Info Diff:"
+	echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
+	echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
+    
+    mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+
+	if [[ $list_defollow == "" && $list_follow == "" || $NUM_FOLLOW == "0" && $NUM_DEFOLLOW == "0" ]]; then
+    	echo -n -e "\n* Nothing has changed!\n"
 		exit 0
     else
-        NUM_FOLLOW=$(echo "$_list_follow" | wc -w)
-        NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
-
-        echo -e "\n* Info Diff:"
-		echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
-		echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
-		
 		echo -e "\n* Conversion ID to Nickname: \n"
 		if [[ ! $NUM_FOLLOW == "0" ]]; then
             i=0
@@ -105,6 +107,7 @@ compare_ids() {
                 echo -n "$((++i)).."
             done
         fi
+        
         if [[ ! $NUM_DEFOLLOW == "0" ]]; then
             i=0
 		    for ids_index in $list_defollow; do
@@ -112,7 +115,7 @@ compare_ids() {
 			    echo -n "$((++i)).."	
 		    done
         fi
-		mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+		
 		echo -n -e "Conversion completed!\n"
 	fi
 
