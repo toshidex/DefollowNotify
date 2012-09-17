@@ -43,7 +43,7 @@ if [ -d $install_home/src/defollownotify ]; then
 	echo -e "\n	- Copy file [ VERSION ] inside /usr/local/src/defollownotify"
     cp uninstall.sh $install_home/src/defollownotify/
     chmod +x $install_home/src/defollownotify/uninstall.sh
-    echo -e "\n - Copy uninstall file inside /usr/local/src/defollownotify and change permissions"
+    echo -e "\n        - Copy uninstall file inside /usr/local/src/defollownotify and change permissions"
 fi
 
 echo -e "\n* Update Complete!"
