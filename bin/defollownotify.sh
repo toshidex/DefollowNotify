@@ -87,16 +87,18 @@ compare_ids() {
 
 	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
 	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
-    NUM_FOLLOW=$(echo "$_list_follow" | wc -w)
+    NUM_FOLLOW=$(echo "$list_follow" | wc -w)
     NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
 
     echo -e "\n* Info Diff:"
+    echo "LIST_DEFOLLOW: $list_defollow";
+    echo "LIST_FOLLOW: $list_follow";
+
 	echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
 	echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
     
-    mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 
-	if [[ $list_defollow == "" && $list_follow == "" || $NUM_FOLLOW == "0" && $NUM_DEFOLLOW == "0" ]]; then
+	if [[ $list_defollow == "" && $list_follow == "" && $NUM_FOLLOW -eq 0 && $NUM_DEFOLLOW -eq 0 ]]; then
     	echo -n -e "\n* Nothing has changed!\n"
 		exit 0
     else
@@ -119,6 +121,8 @@ compare_ids() {
 		
 		echo -n -e "Conversion completed!\n"
 	fi
+    
+    mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 
 }
 
@@ -136,7 +140,7 @@ create_ids() {
 
 		#inversion file and delete the first three rows
 		tac $filename > /tmp/idsxx.xml
-		sed -i '1,2d' /tmp/idsxx.xml
+		sed -i '1,3d' /tmp/idsxx.xml
 		tac /tmp/idsxx.xml > $filename	
 	
 		#move temporany file into original directory
@@ -152,7 +156,7 @@ create_ids() {
 
                 #inversion file and delete the first three rows
                 tac $filename > /tmp/ids_newxx.xml
-                sed -i '1,2d' /tmp/ids_newxx.xml
+                sed -i '1,3d' /tmp/ids_newxx.xml
          	tac /tmp/ids_newxx.xml > $filename
 
                 #move temporany file into original directory
@@ -213,11 +217,13 @@ notify_me() {
     let "lenght_follow=${#screen_name_follow[@]}-1"
     let "lenght_defollow=${#screen_name_defollow[@]}-1"
 	echo ""
+
 	local i=0
     for index in $(seq 0 $lenght_follow); do
-        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m"
+        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n\n"
     done
-    local i=0
+    
+    i=0
     for index in $(seq 0 $lenght_defollow); do
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
 			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
