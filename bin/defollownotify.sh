@@ -91,9 +91,6 @@ compare_ids() {
     NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
 
     echo -e "\n* Info Diff:"
-    echo "LIST_DEFOLLOW: $list_defollow";
-    echo "LIST_FOLLOW: $list_follow";
-
 	echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
 	echo -e "       \e[0;1;32m - New Defollow: $NUM_DEFOLLOW \e[m"
     
