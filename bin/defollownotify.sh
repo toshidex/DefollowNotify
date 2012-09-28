@@ -106,6 +106,7 @@ compare_ids() {
                 convert_ids "$ids_index" 1
                 echo -n "$((++i)).."
             done
+            echo -e "\n"
         fi
         
         if [[ ! $NUM_DEFOLLOW == "0" ]]; then
@@ -113,11 +114,12 @@ compare_ids() {
 		    for ids_index in $list_defollow; do
 			    convert_ids "$ids_index" 2
 			    echo -n "$((++i)).."	
-		    done
+            done
+            echo -e "\n"
         fi
 		
 		echo -n -e "Conversion completed!\n"
-	fi
+    fi
     
     mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
 
@@ -161,17 +163,6 @@ create_ids() {
                 rm /tmp/ids_newxx.xml
 	fi
 }
-
-#save_stat() {
-#
-#	if [[ ! -f $HOME/.defollownotify/stats.log ]]; then
-#		touch $HOME/.defollownotify/stats.log
-#	
-#				
-#	fi		
-#
-#
-#}
 
 download_ids_list() {
 
@@ -217,10 +208,11 @@ notify_me() {
 
 	local i=0
     for index in $(seq 0 $lenght_follow); do
-        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n\n"
+        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n"
     done
     
     i=0
+    echo -e "\n"
     for index in $(seq 0 $lenght_defollow); do
 		if [[ $BASTARD_MODE == "TRUE" ]]; then
 			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
