@@ -104,21 +104,18 @@ compare_ids() {
             i=0
             for ids_index in $list_follow; do
                 convert_ids "$ids_index" 1
-                echo -n "$((++i)).."
+                echo -e -n "$((++i)).."
             done
-            echo -e "\n"
         fi
         
         if [[ ! $NUM_DEFOLLOW == "0" ]]; then
-            i=0
 		    for ids_index in $list_defollow; do
 			    convert_ids "$ids_index" 2
 			    echo -n "$((++i)).."	
             done
-            echo -e "\n"
         fi
 		
-		echo -n -e "Conversion completed!\n"
+		echo -n -e "\nConversion completed!\n"
     fi
     
     mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
@@ -204,23 +201,27 @@ notify_me() {
 
     let "lenght_follow=${#screen_name_follow[@]}-1"
     let "lenght_defollow=${#screen_name_defollow[@]}-1"
-	echo ""
+    local i=0
 
-	local i=0
-    for index in $(seq 0 $lenght_follow); do
-        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n"
-    done
+    if [ ! $lenght_follow -lt 0 ]; then
+        echo -e "\n"
+        for index in $(seq 0 $lenght_follow); do
+            echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n"
+        done
+    fi
     
-    i=0
-    echo -e "\n"
-    for index in $(seq 0 $lenght_defollow); do
-		if [[ $BASTARD_MODE == "TRUE" ]]; then
-			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
-		else
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
-		fi
-	done
+    if [ ! $lenght_defollow -lt 0 ]; then
+         i=0
+        echo -e "\n"
+        for index in $(seq 0 $lenght_defollow); do
+		    if [[ $BASTARD_MODE == "TRUE" ]]; then
+			    TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
+			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
+		    else
+			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
+            fi
+        done
+    fi
 }
 
 
