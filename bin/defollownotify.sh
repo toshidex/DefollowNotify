@@ -25,9 +25,11 @@ usage(){
         
 Use: defollownotify [OPTION]
         
-   -B      Enable Bastard Mode - Notification via Twitter
+  -B       Enable Bastard Mode - Notification via Twitter
 
-   -v	   Print Version
+  -N @user Send a notify of defollow at the @user     
+
+  -v	   Print Version
 
 * If you want uninstall defollownotify you have to run /usr/local/src/defollownotify/uninstall.sh
 USAGE
@@ -196,6 +198,10 @@ download_ids_list() {
 	fi
 }
 
+revenge() 
+{
+    TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
+}
 
 notify_me() {
 
@@ -215,7 +221,7 @@ notify_me() {
         echo -e "\n"
         for index in $(seq 0 $lenght_defollow); do
 		    if [[ $BASTARD_MODE == "TRUE" ]]; then
-			    TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
+			    revenge "@${screen_name_defollow[$index]}"
 			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
 		    else
 			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
@@ -227,11 +233,15 @@ notify_me() {
 
 load_config
 
-while getopts ":Bvh" opt; do
+while getopts ":BNvh" opt; do
 	case $opt in
 		"B")
 			BASTARD_MODE="TRUE"
 		;;
+        "N")
+            revenge "$2"
+            exit 0
+        ;;
 		"v")
 			echo -e "\nDefollowNotify - $(cat /usr/local/src/defollownotify/VERSION) \n";
 			exit 0
