@@ -67,7 +67,10 @@ load_config() {
 
 print_error() {
 
-	[[ ! -z $1 ]] && echo -e "\e[0;1;31m\n*ERROR:$error\e[m\n" && exit 1
+    if [[ ! -z $1 ]]; then
+        echo -e "\e[0;1;31m\n*ERROR: $1\e[m\n"
+        exit 1
+    fi
 }
 
 convert_ids() {
@@ -169,14 +172,12 @@ download_ids_list() {
 		echo -e "\n* Download ids list.."
  		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		
-		local error=$(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
-		print_error $error
+		print_error $(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 		
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
 			compare_ids
-			#save_stat
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
@@ -185,8 +186,7 @@ download_ids_list() {
 		echo -e "\n* Download ids list.."
                 curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		
-		local error=$(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
-		print_error $error
+		print_error $(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 	
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		if [ $next_cursor -eq 0 ]; then
@@ -200,7 +200,12 @@ download_ids_list() {
 
 revenge() 
 {
-    TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
+    if [[ $(echo "$1" | egrep "^@") != "" ]]; then
+        TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
+        echo "Notify Send!"
+    else
+        print_error "Define an user to notify"
+    fi 
 }
 
 notify_me() {
