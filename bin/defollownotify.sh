@@ -25,9 +25,11 @@ usage(){
         
 Use: defollownotify [OPTION]
         
-   -B      Enable Bastard Mode - Notification via Twitter
+   -B      	Enable Bastard Mode - Notification via Twitter
 
-   -v	   Print Version
+   -N @user 	Send a notify of defollow at the @user
+
+   -v	   	Print Version
 
 * If you want uninstall defollownotify you have to run /usr/local/src/defollownotify/uninstall.sh
 USAGE
@@ -202,6 +204,12 @@ download_ids_list() {
 
 notify_me() {
 
+    if [[ $OPTION_N == "TRUE" ]]; then
+	TO_statuses_update '' "News for @$USER_NAME: The user [ @$OPTARG ] not following you more. http://t.co/RfXKjgbU" ""
+        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${OPTARG}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${OPTARG}\e[m\e[0;1;34m ]\e[m"
+	exit 0
+    fi
+
     let "lenght_follow=${#screen_name_follow[@]}-1"
     let "lenght_defollow=${#screen_name_defollow[@]}-1"
 	echo ""
@@ -226,10 +234,15 @@ notify_me() {
 
 load_config
 
-while getopts ":Bvh" opt; do
+while getopts "Bvh:N:" opt; do
 	case $opt in
 		"B")
 			BASTARD_MODE="TRUE"
+		;;
+		"N")
+			OPTION_N="TRUE"
+			notify_me $OPTARG
+			exit 0			
 		;;
 		"v")
 			echo -e "\nDefollowNotify - $(cat /usr/local/src/defollownotify/VERSION) \n";
