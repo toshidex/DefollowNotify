@@ -150,19 +150,19 @@ create_ids() {
 	else	
 		#CREATE SECOND FILE IDS
 		#delete the first three rows
-                sed -i '1,3d' $filename
+        sed -i '1,3d' $filename
 
-                #delete tags <id> and </id>
-                sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+        #delete tags <id> and </id>
+        sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
 
-                #inversion file and delete the first three rows
-                tac $filename > /tmp/ids_newxx.xml
-                sed -i '1,3d' /tmp/ids_newxx.xml
-         	tac /tmp/ids_newxx.xml > $filename
+        #inversion file and delete the first three rows
+        tac $filename > /tmp/ids_newxx.xml
+        sed -i '1,3d' /tmp/ids_newxx.xml
+        tac /tmp/ids_newxx.xml > $filename
 
-                #move temporany file into original directory
-                mv $filename $HOME_IDS
-                rm /tmp/ids_newxx.xml
+        #move temporany file into original directory
+        mv $filename $HOME_IDS
+        rm /tmp/ids_newxx.xml
 	fi
 }
 
@@ -171,31 +171,32 @@ download_ids_list() {
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
 		echo -e "\n* Download ids list.."
  		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
-		
 		print_error $(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
-		
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
-		if [ $next_cursor -eq 0 ]; then
+		
+        if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
 			compare_ids
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
 		fi
-        else
+        
+    else
 		echo -e "\n* Download ids list.."
-                curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+        curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		
 		print_error $(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 	
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
-		if [ $next_cursor -eq 0 ]; then
+		
+        if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids.xml"
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
-        	fi
-	fi
+        fi
+    fi
 }
 
 revenge() 
