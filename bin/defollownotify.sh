@@ -25,11 +25,19 @@ usage(){
         
 Use: defollownotify [OPTION]
         
+<<<<<<< HEAD
    -B      	Enable Bastard Mode - Notification via Twitter
 
    -N @user 	Send a notify of defollow at the @user
 
    -v	   	Print Version
+=======
+  -B       Enable Bastard Mode - Notification via Twitter
+
+  -N @user Send a notify of defollow at the @user     
+
+  -v	   Print Version
+>>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 
 * If you want uninstall defollownotify you have to run /usr/local/src/defollownotify/uninstall.sh
 USAGE
@@ -67,7 +75,10 @@ load_config() {
 
 print_error() {
 
-	[[ ! -z $1 ]] && echo -e "\e[0;1;31m\n*ERROR:$error\e[m\n" && exit 1
+    if [[ ! -z $1 ]]; then
+        echo -e "\e[0;1;31m\n*ERROR: $1\e[m\n"
+        exit 1
+    fi
 }
 
 convert_ids() {
@@ -106,21 +117,18 @@ compare_ids() {
             i=0
             for ids_index in $list_follow; do
                 convert_ids "$ids_index" 1
-                echo -n "$((++i)).."
+                echo -e -n "$((++i)).."
             done
-            echo -e "\n"
         fi
         
         if [[ ! $NUM_DEFOLLOW == "0" ]]; then
-            i=0
 		    for ids_index in $list_defollow; do
 			    convert_ids "$ids_index" 2
 			    echo -n "$((++i)).."	
             done
-            echo -e "\n"
         fi
 		
-		echo -n -e "Conversion completed!\n"
+		echo -n -e "\nConversion completed!\n"
     fi
     
     mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
@@ -150,19 +158,19 @@ create_ids() {
 	else	
 		#CREATE SECOND FILE IDS
 		#delete the first three rows
-                sed -i '1,3d' $filename
+        sed -i '1,3d' $filename
 
-                #delete tags <id> and </id>
-                sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+        #delete tags <id> and </id>
+        sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
 
-                #inversion file and delete the first three rows
-                tac $filename > /tmp/ids_newxx.xml
-                sed -i '1,3d' /tmp/ids_newxx.xml
-         	tac /tmp/ids_newxx.xml > $filename
+        #inversion file and delete the first three rows
+        tac $filename > /tmp/ids_newxx.xml
+        sed -i '1,3d' /tmp/ids_newxx.xml
+        tac /tmp/ids_newxx.xml > $filename
 
-                #move temporany file into original directory
-                mv $filename $HOME_IDS
-                rm /tmp/ids_newxx.xml
+        #move temporany file into original directory
+        mv $filename $HOME_IDS
+        rm /tmp/ids_newxx.xml
 	fi
 }
 
@@ -171,36 +179,43 @@ download_ids_list() {
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
 		echo -e "\n* Download ids list.."
  		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
-		
-		local error=$(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
-		print_error $error
-		
+		print_error $(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
-		if [ $next_cursor -eq 0 ]; then
+		
+        if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids_new.xml"
 			compare_ids
-			#save_stat
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
 		fi
-        else
+        
+    else
 		echo -e "\n* Download ids list.."
-                curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+        curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		
-		local error=$(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
-		print_error $error
+		print_error $(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 	
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
-		if [ $next_cursor -eq 0 ]; then
+		
+        if [ $next_cursor -eq 0 ]; then
 			create_ids "/tmp/ids.xml"
 		else
 			echo "The number of follower >5000. The function has not implemented!"
 			exit 1
-        	fi
-	fi
+        fi
+    fi
 }
 
+revenge() 
+{
+    if [[ $(echo "$1" | egrep "^@") != "" ]]; then
+        TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
+        echo "Notify Send!"
+    else
+        print_error "Define an user to notify"
+    fi 
+}
 
 notify_me() {
 
@@ -212,38 +227,53 @@ notify_me() {
 
     let "lenght_follow=${#screen_name_follow[@]}-1"
     let "lenght_defollow=${#screen_name_defollow[@]}-1"
-	echo ""
+    local i=0
 
-	local i=0
-    for index in $(seq 0 $lenght_follow); do
-        echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n"
-    done
+    if [ ! $lenght_follow -lt 0 ]; then
+        echo -e "\n"
+        for index in $(seq 0 $lenght_follow); do
+            echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_follow[$index]}\e[m\e[0;1;34m] follow you! [\e[m\e[0;1;31m http://twitter.com/${screen_name_follow[$index]}\e[m\e[0;1;34m ]\e[m\n"
+        done
+    fi
     
-    i=0
-    echo -e "\n"
-    for index in $(seq 0 $lenght_defollow); do
-		if [[ $BASTARD_MODE == "TRUE" ]]; then
-			TO_statuses_update '' "News for @$USER_NAME: The user [ @${screen_name_defollow[$index]} ] not following you more. http://t.co/RfXKjgbU" ""
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
-		else
-			echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
-		fi
-	done
+    if [ ! $lenght_defollow -lt 0 ]; then
+         i=0
+        echo -e "\n"
+        for index in $(seq 0 $lenght_defollow); do
+		    if [[ $BASTARD_MODE == "TRUE" ]]; then
+			    revenge "@${screen_name_defollow[$index]}"
+			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
+		    else
+			    echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${screen_name_defollow[$index]}\e[m\e[0;1;34m] not following you more! [\e[m\e[0;1;31m http://twitter.com/${screen_name_defollow[$index]}\e[m\e[0;1;34m ]\e[m"
+            fi
+        done
+    fi
 }
 
 
 load_config
 
+<<<<<<< HEAD
 while getopts "Bvh:N:" opt; do
+=======
+while getopts ":BNvh" opt; do
+>>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 	case $opt in
 		"B")
 			BASTARD_MODE="TRUE"
 		;;
+<<<<<<< HEAD
 		"N")
 			OPTION_N="TRUE"
 			notify_me $OPTARG
 			exit 0			
 		;;
+=======
+        "N")
+            revenge "$2"
+            exit 0
+        ;;
+>>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 		"v")
 			echo -e "\nDefollowNotify - $(cat /usr/local/src/defollownotify/VERSION) \n";
 			exit 0
