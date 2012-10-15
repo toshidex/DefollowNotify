@@ -25,19 +25,11 @@ usage(){
         
 Use: defollownotify [OPTION]
         
-<<<<<<< HEAD
    -B      	Enable Bastard Mode - Notification via Twitter
 
    -N @user 	Send a notify of defollow at the @user
 
    -v	   	Print Version
-=======
-  -B       Enable Bastard Mode - Notification via Twitter
-
-  -N @user Send a notify of defollow at the @user     
-
-  -v	   Print Version
->>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 
 * If you want uninstall defollownotify you have to run /usr/local/src/defollownotify/uninstall.sh
 USAGE
@@ -253,27 +245,16 @@ notify_me() {
 
 load_config
 
-<<<<<<< HEAD
 while getopts "Bvh:N:" opt; do
-=======
-while getopts ":BNvh" opt; do
->>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 	case $opt in
 		"B")
 			BASTARD_MODE="TRUE"
 		;;
-<<<<<<< HEAD
 		"N")
 			OPTION_N="TRUE"
 			notify_me $OPTARG
 			exit 0			
 		;;
-=======
-        "N")
-            revenge "$2"
-            exit 0
-        ;;
->>>>>>> 1748b5d5a227eff146ade4aa81b218873bdcad38
 		"v")
 			echo -e "\nDefollowNotify - $(cat /usr/local/src/defollownotify/VERSION) \n";
 			exit 0
