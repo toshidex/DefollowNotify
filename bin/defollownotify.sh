@@ -137,11 +137,11 @@ create_ids() {
 		sed -i '1,3d' $filename
 
 		#delete tags <id> and </id>
-		sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+		sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
 
 		#inversion file and delete the first three rows
 		tac $filename > /tmp/idsxx.xml
-		sed -i '1,3d' /tmp/idsxx.xml
+		sed -i '1,4d' /tmp/idsxx.xml
 		tac /tmp/idsxx.xml > $filename	
 	
 		#move temporany file into original directory
@@ -153,11 +153,11 @@ create_ids() {
         sed -i '1,3d' $filename
 
         #delete tags <id> and </id>
-        sed -i -e 's/<id>//g' -e 's/<\/id>//g' $filename
+        sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
 
         #inversion file and delete the first three rows
         tac $filename > /tmp/ids_newxx.xml
-        sed -i '1,3d' /tmp/ids_newxx.xml
+        sed -i '1,4d' /tmp/ids_newxx.xml
         tac /tmp/ids_newxx.xml > $filename
 
         #move temporany file into original directory
