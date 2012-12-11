@@ -109,14 +109,14 @@ compare_ids() {
             i=0
             for ids_index in $list_follow; do
                 convert_ids "$ids_index" 1
-                echo -e -n "$((++i)).."
+                echo -e -n "$((++i)).. "
             done
         fi
         
         if [[ ! $NUM_DEFOLLOW == "0" ]]; then
 		    for ids_index in $list_defollow; do
 			    convert_ids "$ids_index" 2
-			    echo -n "$((++i)).."	
+			    echo -n "$((++i)).. "	
             done
         fi
 		
@@ -199,22 +199,22 @@ download_ids_list() {
     fi
 }
 
-revenge() 
-{
-    if [[ $(echo "$1" | egrep "^@") != "" ]]; then
-        TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
-        echo "Notify Send!"
-    else
-        print_error "Define an user to notify"
-    fi 
-}
+#revenge() 
+#{
+#    if [[ $(echo "$1" | egrep "^@") != "" ]]; then
+#        TO_statuses_update '' "News for @$USER_NAME: The user [ $1 ] not following you more. http://t.co/RfXKjgbU" ""   
+#        echo "Notify Send!"
+#    else
+#        print_error "Define an user to notify"
+#    fi 
+#}
 
 notify_me() {
 
     if [[ $OPTION_N == "TRUE" ]]; then
-	TO_statuses_update '' "News for @$USER_NAME: The user [ @$OPTARG ] not following you more. http://t.co/RfXKjgbU" ""
+	    TO_statuses_update '' "News for @$USER_NAME: The user [ @$OPTARG ] not following you more. http://t.co/RfXKjgbU" ""
         echo -e "\e[0;1;34m$((++i)). [\e[m\e[0;1;31m@${OPTARG}\e[m\e[0;1;34m] not following you more. Notification sent! [\e[m\e[0;1;31m http://twitter.com/${OPTARG}\e[m\e[0;1;34m ]\e[m"
-	exit 0
+	    exit 0
     fi
 
     let "lenght_follow=${#screen_name_follow[@]}-1"
