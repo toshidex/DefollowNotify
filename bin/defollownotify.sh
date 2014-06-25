@@ -65,6 +65,15 @@ load_config() {
     fi
 }
 
+verify_auth() {
+
+		T_ACCOUNT_VERIFY_CREDENTIALS='https://api.twitter.com/1/account/verify_credentials.json'
+		EXPORT auth_header=$(OAuth_authorization_header 'X-Verify-Credentials-Authorization' 'http://api.twitter.com' '' '' 'GET' "$T_ACCOUNT_VERIFY_CREDENTIALS")
+		#ret=$(curl -s -H "X-Auth-Service-Provider=$T_ACCOUNT_VERIFY_CREDENTIALS" -H "$auth_header" -F "key=$twitpic_api" -F "message=$tcli_status" -F "media=@$tcli_file" http://twitpic.com/api/2/upload.xml)
+
+		echo $auth_header
+}
+
 print_error() {
 
     if [[ ! -z $1 ]]; then
@@ -75,7 +84,7 @@ print_error() {
 
 convert_ids() {
 
-	name=$(curl -s "https://api.twitter.com/1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
+	name=$(curl -s "https://api.twitter.com/1.1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
 	if [[ "$name" == "" ]]; then
 		echo -e "\e[0;1;34mUser [\e[m\e[0;1;31m $1 \e[m\e[0;1;34m] not found.\n\e[m" 
 		return
@@ -170,7 +179,7 @@ download_ids_list() {
 
 	if [ -f $HOME/.defollownotify/ids.xml ]; then
 		echo -e "\n* Download ids list.."
- 		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+ 		curl -s -o /tmp/ids_new.xml "https://api.twitter.com/1.1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		print_error $(grep "<error>" /tmp/ids_new.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 		local next_cursor=$(grep "<next_cursor>" /tmp/ids_new.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
 		
@@ -184,7 +193,7 @@ download_ids_list() {
         
     else
 		echo -e "\n* Download ids list.."
-        curl -s -o /tmp/ids.xml "https://api.twitter.com/1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
+        curl -s -o /tmp/ids.xml "https://api.twitter.com/1.1/followers/ids.xml?cursor=-1&screen_name=$USER_NAME"
 		
 		print_error $(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
 	
@@ -270,7 +279,9 @@ while getopts "Bvh:N:" opt; do
 	esac
 done
 
-download_ids_list
-notify_me
+verify_auth
+
+#download_ids_list
+#notify_me
 
 exit 0
