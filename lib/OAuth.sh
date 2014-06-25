@@ -1,28 +1,25 @@
 #!/bin/bash
-# Copyright (c) 2010, Yu-Jie Lin
-# All rights reserved.
+# Copyright (c) 2010, 2012 Yu-Jie Lin
 # 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
 # 
-#  * Redistributions of source code must retain the above copyright notice,
-#    this list of conditions and the following disclaimer.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 # 
-#  * Redistributions in binary form must reproduce the above copyright notice,
-#    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+BASHOAUTH_VERSION=0.2.0
 
 OAuth_debug () {
 	# Print out all parameters, each in own line
@@ -48,7 +45,7 @@ OAuth_PE () {
 	# Encode $1 using Percent-encoding as defined in
 	# http://tools.ietf.org/html/rfc5849#section-3.6
 	# Any character other than [a-zA-Z0-9-._~] is converted into format %XX
-    [ -n "$1" ] \
+	[ -n "$1" ] \
 	&& echo -n "$1" | perl -p -e 's/([^A-Za-z0-9-._~])/sprintf("%%%02X", ord($1))/seg'
 }
 
@@ -56,7 +53,7 @@ OAuth_PE_file () {
 	# Encode a file $1 using Percent-encoding as defined in
 	# http://tools.ietf.org/html/rfc5849#section-3.6
 	# $1 a filename, not the content of file
-    perl -p -e 's/([^A-Za-z0-9-._~])/sprintf("%%%02X", ord($1))/seg' < "$1"
+	perl -p -e 's/([^A-Za-z0-9-._~])/sprintf("%%%02X", ord($1))/seg' < "$1"
 }
 
 OAuth_params_string () {
@@ -110,9 +107,9 @@ OAuth_param_raw_value () {
 
 OAuth_HMAC_SHA1 () {
 	# Hash the text $1 with key $2
-    local text="$1"
+	local text="$1"
 	local key="$2"
-    echo -n "$text" | openssl dgst -sha1 -binary -hmac "$key" | base64
+	echo -n "$text" | openssl dgst -sha1 -binary -hmac "$key" | base64
 	}
 
 _OAuth_signature () {
