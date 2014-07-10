@@ -77,10 +77,12 @@ print_error() {
 convert_ids() {
 
 	name=$(curl -s "https://api.twitter.com/1.1/users/show.xml?user_id=$1" | grep "<screen_name>" | sed -e 's/<screen_name>//g' -e 's/<\/scre.*//g' -e 's/  //g')
-	if [[ "$name" == "" ]]; then
-		echo -e "\e[0;1;34mUser [\e[m\e[0;1;31m $1 \e[m\e[0;1;34m] not found.\n\e[m" 
-		return
-	fi
+
+	qualcosa | grep -Eo "screen_name\":\"[[:alpha:]]*" | head -1 | awk -F '"' '{print $3}'
+	#if [[ "$name" == "" ]]; then
+#		echo -e "\e[0;1;34mUser [\e[m\e[0;1;31m $1 \e[m\e[0;1;34m] not found.\n\e[m" 
+#		return
+#	fi
     
     if [[ $2 == 1 ]]; then
         screen_name_follow=(${screen_name_follow[@]} $name )
@@ -91,10 +93,10 @@ convert_ids() {
 
 compare_ids() {
 
-	list_defollow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep "<" | awk -F'<| ' '{ print $3}')"
-	list_follow="$(diff $HOME_IDS/ids.xml $HOME_IDS/ids_new.xml | grep ">" | awk -F'>| ' '{ print $3}')"
-    NUM_FOLLOW=$(echo "$list_follow" | wc -w)
-    NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
+	list_defollow="$(diff $HOME_IDS/list_ids $HOME_IDS/list_ids_new | grep "<" | awk -F'<| ' '{ print $3}')"
+	list_follow="$(diff $HOME_IDS/list_ids $HOME_IDS/list_ids_new | grep ">" | awk -F'>| ' '{ print $3}')"
+    	NUM_FOLLOW=$(echo "$list_follow" | wc -w)
+    	NUM_DEFOLLOW=$(echo "$list_defollow" | wc -w)
 
     echo -e "\n* Info Diff:"
 	echo -e "       \e[0;1;34m - New Follower: $NUM_FOLLOW \e[m"
@@ -124,7 +126,7 @@ compare_ids() {
 		echo -n -e "\nConversion completed!\n"
     fi
     
-    mv $HOME_IDS/ids_new.xml $HOME_IDS/ids.xml
+    mv $HOME_IDS/list_ids_new $HOME_IDS/list_ids
 
 }
 
@@ -171,8 +173,17 @@ download_ids_list_new () {
 
 
 	
-	if [ -f $HOME/.defollownotify/ids.xml ]; then
-		echo
+	if [ -f $HOME/.defollownotify/list_ids ]; then
+		echo -e "\n* Download ids list.."
+		TO_get_followers_ids "$USER_NAME" "5000"
+		echo $TO_ret
+
+		echo $TO_ret | awk -F']' '{print $1}' | awk -F'[' '{print $2}' | tr ',' '\n' > /tmp/list_ids_new
+		
+		cp /tmp/list_ids_new $HOME_IDS
+	
+		compare_ids
+
 	else
 		
 		echo -e "\n* Download ids list.."
@@ -303,7 +314,11 @@ while getopts "Bvh:N:" opt; do
 	esac
 done
 
-download_ids_list_new
+
+TO_get_users_show "toshidex" "101792150"
+
+
+#download_ids_list_new
 #download_ids_list
 #notify_me
 
