@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 ###############################################################################
 # @Author : Ennio Giliberto aka Lightuono / Toshidex
@@ -65,14 +65,6 @@ load_config() {
     fi
 }
 
-verify_auth() {
-
-		T_ACCOUNT_VERIFY_CREDENTIALS='https://api.twitter.com/1/account/verify_credentials.json'
-		EXPORT auth_header=$(OAuth_authorization_header 'X-Verify-Credentials-Authorization' 'http://api.twitter.com' '' '' 'GET' "$T_ACCOUNT_VERIFY_CREDENTIALS")
-		#ret=$(curl -s -H "X-Auth-Service-Provider=$T_ACCOUNT_VERIFY_CREDENTIALS" -H "$auth_header" -F "key=$twitpic_api" -F "message=$tcli_status" -F "media=@$tcli_file" http://twitpic.com/api/2/upload.xml)
-
-		echo $auth_header
-}
 
 print_error() {
 
@@ -136,44 +128,76 @@ compare_ids() {
 
 }
 
-create_ids() {
+#create_ids() {
 
-	filename="$1"
+#	filename="$1"
 
-	if [[ $filename == "/tmp/ids.xml" ]]; then
+#	if [[ $filename == "/tmp/ids.xml" ]]; then
 			
 		#delete the first three rows
-		sed -i '1,3d' $filename
+#		sed -i '1,3d' $filename
 
 		#delete tags <id> and </id>
-		sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
+#		sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
 
 		#inversion file and delete the first three rows
-		tac $filename > /tmp/idsxx.xml
-		sed -i '1,4d' /tmp/idsxx.xml
-		tac /tmp/idsxx.xml > $filename	
+#		tac $filename > /tmp/idsxx.xml
+#		sed -i '1,4d' /tmp/idsxx.xml
+#		tac /tmp/idsxx.xml > $filename	
 	
 		#move temporany file into original directory
-		mv $filename $HOME_IDS
-		rm /tmp/idsxx.xml
-	else	
+#		mv $filename $HOME_IDS
+#		rm /tmp/idsxx.xml
+#	else	
 		#CREATE SECOND FILE IDS
 		#delete the first three rows
-        sed -i '1,3d' $filename
+ #       sed -i '1,3d' $filename
 
         #delete tags <id> and </id>
-        sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
+  #      sed -i -e 's/ *<id>//g' -e 's/<\/id>//g' $filename
 
         #inversion file and delete the first three rows
-        tac $filename > /tmp/ids_newxx.xml
-        sed -i '1,4d' /tmp/ids_newxx.xml
-        tac /tmp/ids_newxx.xml > $filename
+   #     tac $filename > /tmp/ids_newxx.xml
+   #     sed -i '1,4d' /tmp/ids_newxx.xml
+   #     tac /tmp/ids_newxx.xml > $filename
 
         #move temporany file into original directory
-        mv $filename $HOME_IDS
-        rm /tmp/ids_newxx.xml
-	fi
+    #    mv $filename $HOME_IDS
+    #    rm /tmp/ids_newxx.xml
+#	fi
+#}
+
+download_ids_list_new () {
+
+
+	
+	if [ -f $HOME/.defollownotify/ids.xml ]; then
+		echo
+	else
+		
+		echo -e "\n* Download ids list.."
+		TO_get_followers_ids "$USER_NAME" "5000"
+		echo $TO_ret
+
+		echo $TO_ret | awk -F']' '{print $1}' | awk -F'[' '{print $2}' | tr ',' '\n' > /tmp/list_ids
+		cp /tmp/list_ids $HOME_IDS
+		#rm /tmp/list_ids
+
+		
+		#print_error $(grep "<error>" /tmp/ids.xml | sed -e 's/<error>//g' -e 's/<\/err.*//g') #GET ERROR
+	
+		#local next_cursor=$(grep "<next_cursor>" /tmp/ids.xml | sed -e 's/<next_cursor>//g' -e 's/<\/next.*//g') #GET NEXT_CURSOR
+		
+	        #if [ $next_cursor -eq 0 ]; then
+		#	create_ids "/tmp/ids.xml"
+		#else
+		#	echo "The number of follower >5000. The function has not implemented!"
+		#	exit 1
+        #fi
+    fi
+
 }
+
 
 download_ids_list() {
 
@@ -279,8 +303,7 @@ while getopts "Bvh:N:" opt; do
 	esac
 done
 
-verify_auth
-
+download_ids_list_new
 #download_ids_list
 #notify_me
 

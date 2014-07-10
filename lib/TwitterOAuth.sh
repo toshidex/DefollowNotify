@@ -30,6 +30,7 @@ T_API_VERSION="1.1"
 T_ACCOUNT_UPDATE_PROFILE_IMAGE="https://api.twitter.com/$T_API_VERSION/account/update_profile_image"
 T_STATUSES_UPDATE="https://api.twitter.com/$T_API_VERSION/statuses/update"
 T_STATUSES_HOME_TIMELINE="https://api.twitter.com/${T_API_VERSION}/statuses/home_timeline"
+T_FOLLOWERS_IDS="https://api.twitter.com/${T_API_VERSION}/followers/ids"
 
 T_REQUEST_TOKEN='https://api.twitter.com/oauth/request_token'
 T_ACCESS_TOKEN='https://api.twitter.com/oauth/access_token'
@@ -170,3 +171,32 @@ TO_statuses_home_timeline () {
 
   return $TO_rval
   }
+
+
+TO_get_followers_ids () {
+
+  local format="json"
+  local screen_name="$1"
+  local count="$2"
+  [[ "$count" == "" ]] && count=1
+
+  local params=(
+    $(OAuth_param 'screen_name' $screen_name)
+    $(OAuth_param 'count' $count)
+    )
+
+  local auth_header=$(OAuth_authorization_header 'Authorization' 'http://api.twitter.com' '' '' 'GET' "$T_FOLLOWERS_IDS.$format" ${params[@]})
+
+
+ #  echo "$auth_header"
+
+  # ret=$(echo $auth_header | awk '{print $1,$2,$3,$6,$9",",$4,$7,$8,$5}' | sed '$s/.$//')
+
+#echo $ret
+
+  convscreen=$(OAuth_PE "$screen_name");
+  TO_ret=$(curl -s --get "${T_FOLLOWERS_IDS}.${format}" --data "screen_name=${convscreen}&count=${count}" --header "${auth_header}")
+  TO_rval=$?
+
+  return $TO_rval
+}
