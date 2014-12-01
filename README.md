@@ -33,6 +33,3 @@ Uninstall
 
 `$ sudo ./uninstall.sh`
 
-
-
-
