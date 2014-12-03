@@ -6,7 +6,7 @@ Defollow Notify is a free and Open Source script that allows you to notify (and 
 Requirements
 ------------
 
-* GNU/Linux ( Debian, Ubuntu, Gentoo, Archlinux, etc..)
+* GNU/Linux ( Debian, Ubuntu, Gentoo, Archlinux, etc..) OR Mac OS X
 * Bash Shell
 * Curl
 
@@ -16,6 +16,8 @@ Install
 `$ chmod +x install.sh`
 
 `$ sudo ./install.sh`
+
+On OS X you must install `md5sha1sum` using using [Homebrew](http://brew.sh) and create `/usr/local/src/` directory manually.
 
 Run
 ---
@@ -30,6 +32,4 @@ Uninstall
 `$ chmod +x uninstall.sh`
 
 `$ sudo ./uninstall.sh`
-
-
 
