@@ -17,8 +17,6 @@ Install
 
 `$ sudo ./install.sh`
 
-On OS X you must install `md5sha1sum` using using [Homebrew](http://brew.sh) and create `/usr/local/src/` directory manually.
-
 Run
 ---
 
