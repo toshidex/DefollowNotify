@@ -1,12 +1,12 @@
 Defollow Notify ( Twitter )
 ===========================
 
-Defollow Notify is a free and Open Source script that allows you to notify (and to be notified) , with a tweet, the  defollow of users.
+Defollow Notify is a free and Open Source script that allows you to notify (and to be notified) when users defollow you with a tweet.
 
 Requirements
 ------------
 
-* GNU/Linux ( Debian, Ubuntu, Gentoo, Archlinux, etc..) OR Mac OS X
+* GNU/Linux ( Debian, Ubuntu, Gentoo, Archlinux, etc..), Mac OS X, or BSD
 * Bash Shell
 * Curl
 
@@ -22,7 +22,8 @@ Run
 
 `$ defollownotify`
 
-The firt time `defollownotify` download the list of users from Twitter and will create the `ids.xml`. Launching for the second time to control the defollow.
+The first time `defollownotify` is run, it downloads the list of users following you from Twitter and creates `ids.xml` to track changes.
+Afterwards, running `defollownotify` tracks defollows.
 
 Uninstall
 ---------
