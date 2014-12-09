@@ -37,6 +37,9 @@ OAuth_nonce () {
 		md5sum <<< "$RANDOM-$(date +%s.%N)" | cut -d' ' -f 1
 	elif hash md5 2>/dev/null; then
 		md5 <<< "$RANDOM-$(date +%s.%N)"
+	else
+		>&2 echo "no md5 command found"
+		exit 1
 	fi
 	}
 
