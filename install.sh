@@ -60,6 +60,10 @@ fi
 
 echo -e "\n* Installing in progress.."
 
+if [ ! -d $install_home/src/ ]; then
+	mkdir $install_home/src/
+fi
+
 if [ ! -d $install_home/src/defollownotify ]; then
 	mkdir $install_home/src/defollownotify
 	echo -e "\n	- Create directory [ defollownotify ] inside $install_home/src"

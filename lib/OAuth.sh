@@ -33,7 +33,14 @@ OAuth_debug () {
 
 OAuth_nonce () {
 	# Return a nonce
-	md5sum <<< "$RANDOM-$(date +%s.%N)" | cut -d' ' -f 1
+	if hash md5sum 2>/dev/null; then
+		md5sum <<< "$RANDOM-$(date +%s.%N)" | cut -d' ' -f 1
+	elif hash md5 2>/dev/null; then
+		md5 <<< "$RANDOM-$(date +%s.%N)"
+	else
+		>&2 echo "no md5 command found"
+		exit 1
+	fi
 	}
 
 OAuth_timestamp () {
